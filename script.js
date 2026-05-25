@@ -6,6 +6,19 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO'
 }).addTo(map);
 
+// ---------------- SIDEBAR TOGGLE ----------------
+
+const sidebar = document.getElementById("sidebar");
+const toggleBtn = document.getElementById("toggleSidebar");
+
+toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("hidden");
+
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 300);
+});
+
 // ---------------- ICON ----------------
 
 const icon = L.divIcon({
@@ -24,7 +37,6 @@ function createMarker(loc, index){
 
     marker.data = loc;
 
-    // hover popup
     marker.bindPopup(`
         <div>
             <img src="${loc.image}" style="width:100%;border-radius:8px;">
@@ -35,7 +47,6 @@ function createMarker(loc, index){
     marker.on("mouseover", () => marker.openPopup());
     marker.on("mouseout", () => marker.closePopup());
 
-    // click big popup
     marker.on("click", () => {
 
         L.popup({
@@ -59,7 +70,6 @@ function createMarker(loc, index){
 }
 
 // init markers
-
 locations.forEach(createMarker);
 
 // ---------------- SIDEBAR LIST ----------------
