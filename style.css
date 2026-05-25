@@ -21,7 +21,7 @@ body{
     height:100%;
 }
 
-/* SIDEBAR */
+/* SIDEBAR (DRAWER) */
 #sidebar{
     position:absolute;
     top:0;
@@ -32,16 +32,38 @@ body{
     color:white;
     padding:12px;
     overflow:auto;
-    transition:transform 0.3s ease;
     z-index:1000;
+
+    transform:translateX(0);
+    transition:transform 0.25s ease;
+    will-change: transform;
 }
 
-/* hidden state */
+/* fermé */
 #sidebar.closed{
     transform:translateX(-100%);
 }
 
-/* TOGGLE BUTTON */
+/* overlay mobile */
+#overlay{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    opacity:0;
+    pointer-events:none;
+    transition:0.2s;
+    z-index:900;
+}
+
+#overlay.active{
+    opacity:1;
+    pointer-events:auto;
+}
+
+/* bouton */
 #toggleSidebar{
     position:absolute;
     top:10px;
@@ -88,7 +110,7 @@ body{
     box-shadow:0 0 15px rgba(79,172,254,0.7);
 }
 
-/* POPUP BIG */
+/* POPUP */
 .big-popup img{
     width:100%;
     border-radius:12px;
