@@ -10,6 +10,20 @@
     height:100vh;
 }
 
+/* bouton toggle */
+#toggleSidebar{
+    position:absolute;
+    top:10px;
+    left:10px;
+    z-index:1000;
+    background:#111827;
+    color:white;
+    border:none;
+    padding:10px 12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
 /* MAP */
 #map{
     flex:1;
@@ -22,6 +36,12 @@
     color:white;
     padding:12px;
     overflow:auto;
+    transition: transform 0.3s ease;
+}
+
+/* état caché */
+#sidebar.hidden{
+    transform: translateX(-100%);
 }
 
 /* SEARCH */
