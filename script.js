@@ -12,7 +12,7 @@ const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggleSidebar");
 
 toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("hidden");
+    sidebar.classList.toggle("closed");
 
     setTimeout(() => {
         map.invalidateSize();
@@ -69,10 +69,9 @@ function createMarker(loc, index){
     markers.push(marker);
 }
 
-// init markers
 locations.forEach(createMarker);
 
-// ---------------- SIDEBAR LIST ----------------
+// ---------------- LIST ----------------
 
 function renderList(list = locations){
 
