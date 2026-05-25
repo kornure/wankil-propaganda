@@ -6,17 +6,80 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO'
 }).addTo(map);
 
-// ---------------- SIDEBAR TOGGLE ----------------
+// ---------------- SIDEBAR ELEMENTS ----------------
 
 const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggleSidebar");
+const overlay = document.getElementById("overlay");
 
-toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("closed");
+// état
+let isOpen = true;
 
-    setTimeout(() => {
-        map.invalidateSize();
-    }, 300);
+// ouvrir / fermer
+function openSidebar(){
+    sidebar.classList.remove("closed");
+    overlay.classList.add("active");
+    isOpen = true;
+    setTimeout(() => map.invalidateSize(), 250);
+}
+
+function closeSidebar(){
+    sidebar.classList.add("closed");
+    overlay.classList.remove("active");
+    isOpen = false;
+    setTimeout(() => map.invalidateSize(), 250);
+}
+
+function toggleSidebar(){
+    isOpen ? closeSidebar() : openSidebar();
+}
+
+// bouton + overlay
+toggleBtn.addEventListener("click", toggleSidebar);
+overlay.addEventListener("click", closeSidebar);
+
+// ---------------- SWIPE (TOUCH) ----------------
+
+let startX = 0;
+let currentX = 0;
+let dragging = false;
+
+sidebar.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX;
+    dragging = true;
+});
+
+sidebar.addEventListener("touchmove", (e) => {
+    if (!dragging) return;
+
+    currentX = e.touches[0].clientX;
+    let diff = currentX - startX;
+
+    // si fermé → swipe droite ouvre
+    if (!isOpen) {
+        diff = Math.min(diff, 280);
+        if (diff > 0) {
+            sidebar.style.transform = `translateX(${diff - 280}px)`;
+        }
+    }
+
+    // si ouvert → swipe gauche ferme
+    if (isOpen) {
+        diff = Math.min(diff, 0);
+        sidebar.style.transform = `translateX(${diff}px)`;
+    }
+});
+
+sidebar.addEventListener("touchend", (e) => {
+    dragging = false;
+    sidebar.style.transform = "";
+
+    const endX = e.changedTouches[0].clientX;
+    const diff = endX - startX;
+
+    // seuil swipe
+    if (!isOpen && diff > 80) openSidebar();
+    else if (isOpen && diff < -80) closeSidebar();
 });
 
 // ---------------- ICON ----------------
@@ -29,13 +92,11 @@ const icon = L.divIcon({
 
 let markers = [];
 
-// ---------------- CREATE MARKERS ----------------
+// ---------------- MARKERS ----------------
 
 function createMarker(loc, index){
 
     const marker = L.marker(loc.coords, {icon}).addTo(map);
-
-    marker.data = loc;
 
     marker.bindPopup(`
         <div>
@@ -43,9 +104,6 @@ function createMarker(loc, index){
             <h3>${loc.title}</h3>
         </div>
     `);
-
-    marker.on("mouseover", () => marker.openPopup());
-    marker.on("mouseout", () => marker.closePopup());
 
     marker.on("click", () => {
 
@@ -93,13 +151,16 @@ function renderList(list = locations){
             m.openPopup();
 
             setActive(i);
+
+            // mobile: ferme après sélection
+            if (window.innerWidth < 768) closeSidebar();
         });
     });
 }
 
 renderList();
 
-// ---------------- SEARCH LIST ----------------
+// ---------------- SEARCH ----------------
 
 document.getElementById("searchInput").addEventListener("input", (e)=>{
 
@@ -142,13 +203,15 @@ function renderGallery(filter = ""){
             m.openPopup();
 
             setActive(i);
+
+            if (window.innerWidth < 768) closeSidebar();
         });
     });
 }
 
 renderGallery();
 
-// ---------------- ACTIVE STATE ----------------
+// ---------------- ACTIVE ----------------
 
 function setActive(index){
 
